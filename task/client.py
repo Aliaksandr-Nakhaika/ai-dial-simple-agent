@@ -17,60 +17,48 @@ class DialClient:
             api_key: str,
             tools: list[BaseTool] | None = None
     ):
-        if not api_key or api_key.strip() == "":
-            raise ValueError("API key cannot be null or empty")
-
-        self.__endpoint = f"{endpoint}/openai/deployments/{deployment_name}/chat/completions"
-        self.__api_key = api_key
-        self.__tools_dict: dict[str, BaseTool] = {tool.name: tool for tool in tools} or {}
-        self.__tools_schemas: list[str]= [tool.schema for tool in tools] or []
-
-        print(self.__endpoint)
-        print(json.dumps(self.__tools_schemas, indent=4))
+        #TODO:
+        # 1. If not api_key then raise error
+        # 2. Add `self.__endpoint` with formatted `endpoint` with model (model=deployment_name):
+        #   - f"{endpoint}/openai/deployments/{deployment_name}/chat/completions"
+        # 3. Add `self.__api_key`
+        # 4. Prepare tools dict where key will be tool name and value will
+        # 5. Prepare tools list with tool schemas
+        # 6. Optional: print endpoint and tools schemas
+        raise NotImplementedError()
 
 
     def get_completion(self, messages: list[Message], print_request: bool = True) -> Message:
-        headers = {
-            "api-key": self.__api_key,
-            "Content-Type": "application/json"
-        }
-        request_data = {
-            "messages": [msg.to_dict() for msg in messages],
-            "tools": self.__tools_schemas,
-        }
-
-        if print_request:
-            print(self.__endpoint)
-            print("REQUEST:", json.dumps({"messages": [msg.to_dict() for msg in messages]}, indent=2))
-
-        response = requests.post(url=self.__endpoint, headers=headers, json=request_data)
-
-        if response.status_code == 200:
-            data = response.json()
-
-            choices = data.get("choices", [])
-            if choices:
-                choice = choices[0]
-                print("RESPONSE:", json.dumps(choice, indent=2))
-                print("-"*100)
-
-                #TODO:
-                # 1. Get `message` from `choice` and assign to `message_data` variable
-                # 2. Get `content` from `message` and assign to `content` variable
-                # 3. Get `tool_calls` from `message` and assign to `tool_calls` variable
-                # 4. Create `ai_response` Message (with AI role, `content` and `tool_calls`)
-                # 5. If `choice` `finish_reason` is `tool_calls`:
-                #       Yes:
-                #           - append `ai_response` to `messages`
-                #           - call `_process_tool_calls` with `tool_calls` and assign result to `tool_messages` variable
-                #           - add `tool_messages` to `messages` (use `extend` method)
-                #           - make recursive call (return `get_completion` with `messages` and `print_request`)
-                #       No: return `ai_response` (final assistant response)
-
-                return None
-            raise ValueError("No Choice has been present in the response")
-        else:
-            raise Exception(f"HTTP {response.status_code}: {response.text}")
+        #TODO:
+        # 1. create `headers` dict with:
+        #   - "api-key": self._api_key
+        #   - "Content-Type": "application/json"
+        # 2. create `request_data` dict with:
+        #   - "messages": [msg.to_dict() for msg in messages]
+        #   - "tools": self._tools
+        # 3. Optional: print request (message history)
+        # 4. Make POST request (requests) with:
+        #   - url=self._endpoint
+        #   - headers=headers
+        #   - json=request_data
+        # 5. If response status code is 200:
+        #   - get response as json
+        #   - get "choices" from response json
+        #   - get first choice
+        #   - Optional: print choice
+        #   - Get `message` from `choice` and assign to `message_data` variable
+        #   - Get `content` from `message` and assign to `content` variable
+        #   - Get `tool_calls` from `message` and assign to `tool_calls` variable
+        #   - Create `ai_response` Message (with AI role, `content` and `tool_calls`)
+        #   - If `choice` `finish_reason` is `tool_calls`:
+        #       Yes:
+        #           - append `ai_response` to `messages`
+        #           - call `_process_tool_calls` with `tool_calls` and assign result to `tool_messages` variable
+        #           - add `tool_messages` to `messages` (use `extend` method)
+        #           - make recursive call (return `get_completion` with `messages` and `print_request`)
+        #       No: return `ai_response` (final assistant response)
+        # Otherwise raise exception
+        raise NotImplementedError()
 
 
     def _process_tool_calls(self, tool_calls: list[dict[str, Any]]) -> list[Message]:
